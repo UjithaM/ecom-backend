@@ -10,9 +10,10 @@ import { Request } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/entity/user.entity';
 import { Repository } from 'typeorm';
+import { CustomException } from '../exceptions/custom.exception';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class AdminGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     @InjectRepository(User)
@@ -20,6 +21,7 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
@@ -33,11 +35,15 @@ export class AuthGuard implements CanActivate {
         where: { id: payload.sub },
         relations: ['role'],
       });
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
+      if (!user || user.role.name !== 'ADMIN') {
+        throw new CustomException(
+          'You are not authorized to access this resource',
+          403,
+        );
+      }
       request['user'] = user;
-    } catch {
-      throw new UnauthorizedException();
+    } catch(e) {
+      throw e;
     }
     return true;
   }
