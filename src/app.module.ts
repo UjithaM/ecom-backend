@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { RoleModule } from './role/role.module';
+import { CategoryModule } from './category/category.module';
 import * as path from 'node:path';
 
 @Module({
@@ -24,6 +25,7 @@ import * as path from 'node:path';
     AuthModule,
     UsersModule,
     RoleModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
