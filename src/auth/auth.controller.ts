@@ -5,7 +5,8 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  Request, Res,
+  Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
@@ -13,7 +14,6 @@ import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { SignInDTO } from '../users/dto/signInDTO';
 import { SignUpDTO } from '../users/dto/signUp.dto';
-import { AdminGuard } from './admin.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -29,7 +29,8 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('login') async signIn(@Body() loginDto: SignInDTO, @Res() res: Response) {
+  @Post('login')
+  async signIn(@Body() loginDto: SignInDTO, @Res() res: Response) {
     res.json(await this.authService.signIn(loginDto, res));
   }
 
@@ -38,5 +39,4 @@ export class AuthController {
   getProfile(@Request() req) {
     return req.user;
   }
-
 }

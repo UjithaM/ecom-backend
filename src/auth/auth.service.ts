@@ -9,19 +9,26 @@ import e from 'express';
 import { SignUpDTO } from '../users/dto/signUp.dto';
 import { User } from '../users/entity/user.entity';
 import { CustomException } from '../exceptions/custom.exception';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Role } from '../role/entities/role.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    @InjectRepository(Role)
+    private roleRepository: Repository<Role>,
   ) {}
 
   async signIn(
     loginDto: SignInDTO,
     res: e.Response,
   ): Promise<{ access_token: string }> {
-    const user = await this.usersService.findOne(loginDto.userName);
+    console.log(loginDto);
+    const user = await this.usersService.findOne(loginDto.email);
+    console.log(user);
     if (!user) {
       throw new UserNotFoundException();
     }
@@ -55,10 +62,14 @@ export class AuthService {
       throw new CustomException('User email already exists', 400);
     }
 
+    const role = await this.roleRepository.findOne({
+      where: { name: 'USER' }});
+
     const user = new User();
     user.name = signUpDto.name;
     user.email = signUpDto.email;
     user.password = await bcrypt.hash(signUpDto.password, 10);
+    user.role = role as Role;
 
     const savedUser = await this.usersService.create(user);
     const payload = { sub: savedUser.id, username: savedUser.email };
