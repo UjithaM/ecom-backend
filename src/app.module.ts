@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { RoleModule } from './role/role.module';
 import { CategoryModule } from './category/category.module';
+import { ProductModule } from './product/product.module';
 import * as path from 'node:path';
 
 @Module({
@@ -26,6 +27,7 @@ import * as path from 'node:path';
     UsersModule,
     RoleModule,
     CategoryModule,
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [AppService],
