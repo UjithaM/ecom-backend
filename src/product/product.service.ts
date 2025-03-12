@@ -40,7 +40,7 @@ export class ProductService {
 
   async findAll({
     page = 1,
-    limit = 10,
+    limit = 20,
     name = '',
     categoryId = 0,
     minPrice = 0,
@@ -70,6 +70,7 @@ export class ProductService {
         qb.where('product.price <= :maxPrice', { maxPrice })
           .orWhere(':maxPrice = 0', { maxPrice });
       }))
+      .orderBy('product.createdAt', 'DESC')
       .take(take)
       .skip(skip)
       .getManyAndCount();

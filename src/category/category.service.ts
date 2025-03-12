@@ -33,6 +33,7 @@ export class CategoryService {
       where: { name: Like(`%${name}%`) },
       take,
       skip,
+      order: { createdAt: 'ASC' },
     });
 
     return {

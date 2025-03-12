@@ -16,7 +16,6 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { AdminGuard } from '../auth/admin.guard';
-import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('product')
 export class ProductController {
@@ -28,13 +27,13 @@ export class ProductController {
     return this.productService.create(createProductDto);
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get()
   async findAll(@Query('page') page?: number, @Query('limit') limit?: number, @Query('name') name?: string, @Query('categoryId') categoryId?: number, @Query('minPrice') minPrice?: number, @Query('maxPrice') maxPrice?: number) {
     return this.productService.findAll({ page, limit, name, categoryId, minPrice, maxPrice });
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productService.findOne(+id);

@@ -5,13 +5,13 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  Request,
   Res,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { SignInDTO } from './dto/signInDTO';
 import { SignUpDTO } from './dto/signUp.dto';
 
@@ -34,9 +34,15 @@ export class AuthController {
     res.json(await this.authService.signIn(loginDto, res));
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Post('refresh')
+  async refreshToken(@Req() req: Request, @Res() res: Response) {
+    res.json(await this.authService.refreshToken(req, res));
+  }
+
   @UseGuards(AuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
+  getProfile(@Req() req) {
     return req.user;
   }
 }

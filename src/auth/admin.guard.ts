@@ -43,7 +43,7 @@ export class AdminGuard implements CanActivate {
       }
       request['user'] = user;
     } catch(e) {
-      throw e;
+      throw new UnauthorizedException();
     }
     return true;
   }

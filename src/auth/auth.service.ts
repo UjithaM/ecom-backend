@@ -1,4 +1,3 @@
-import { Response } from '@nestjs/common';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -25,7 +24,7 @@ export class AuthService {
   async signIn(
     loginDto: SignInDTO,
     res: e.Response,
-  ): Promise<{ access_token: string }> {
+  ): Promise<{ userID: number; userName: string; userRole: string; userEmail: string; access_token: string }> {
     console.log(loginDto);
     const user = await this.usersService.findOne(loginDto.email);
     console.log(user);
@@ -48,10 +47,14 @@ export class AuthService {
       // secure: true, // Set to true if using HTTPS
       sameSite: 'strict',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      path: '/refresh_token',
+      path: '/',
     });
 
     return {
+      userID: user.id,
+      userName: user.name,
+      userRole: user.role.name,
+      userEmail: user.email,
       access_token: accessToken,
     };
   }
@@ -91,5 +94,41 @@ export class AuthService {
     return {
       access_token: accessToken,
     };
+  }
+
+  async refreshToken(req: e.Request ,res: e.Response) {
+    const refreshToken: string = req.cookies?.['refresh_token'];
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token not found');
+    }
+
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken);
+      const user = await this.usersService.findOne(payload.username);
+      if (!user) {
+        throw new UserNotFoundException();
+      }
+
+      const newAccessToken = await this.jwtService.signAsync({ sub: user.id, username: user.email });
+      const newRefreshToken = await this.jwtService.signAsync({ sub: user.id, username: user.email }, { expiresIn: '30d' });
+
+      res.cookie('refresh_token', newRefreshToken, {
+        httpOnly: true,
+        // secure: true, // Set to true if using HTTPS
+        sameSite: 'strict',
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        path: '/refresh_token',
+      });
+
+      return {
+        userID: user.id,
+        userName: user.name,
+        userRole: user.role.name,
+        userEmail: user.email,
+        access_token: newAccessToken,
+      };
+    } catch (e) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 }

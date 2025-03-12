@@ -2,7 +2,6 @@ import { Controller, Get, Post, Body, Param, Delete, Query, Put, UseGuards } fro
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { AuthGuard } from '../auth/auth.guard';
 import { AdminGuard } from '../auth/admin.guard';
 
 @Controller('category')
@@ -15,13 +14,13 @@ export class CategoryController {
     return this.categoryService.create(createCategoryDto);
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get()
   findAll(@Query('page') page?: number, @Query('limit') limit?: number, @Query('name') name?: string) {
     return this.categoryService.findAll({ page, limit, name });
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.categoryService.findOne(+id);

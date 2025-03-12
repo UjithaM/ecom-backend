@@ -12,7 +12,7 @@ export class UsersService {
 
   async findOne(email: string): Promise<UserEntity | null> {
     console.log('email', email);
-    return this.userRepository.findOne({ where: { email: email } });
+    return this.userRepository.findOne({ where: { email: email }, relations: ['role'] });
   }
 
   async create(user: UserEntity): Promise<UserEntity> {
